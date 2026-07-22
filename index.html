@@ -1,109 +1,270 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="initial-scale=1.0,maximum-scale=1.0">
-	<meta name="referrer" content="no-referrer">
-	<title>IPA Archive</title>
-	<link rel="shortcut icon" href="./favicon.ico">
-	<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
-	<link rel="stylesheet" href="style.css">
-	<script src='script.js?v=2'></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+  <meta name="referrer" content="no-referrer">
+  <meta name="theme-color" content="#f7f7f8">
+  <title>LegStore</title>
+  <link rel="shortcut icon" href="./favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
+  <script src="script.js?v=2" defer></script>
+  <style>
+    :root {
+      --blue: #6d8fb4;
+      --line: rgba(74, 74, 79, .18);
+      --line-soft: rgba(74, 74, 79, .10);
+      --bg: #e9e9ec;
+      --card: #f7f7f8;
+      --text: #55555a;
+      --muted: #89898e;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+      font-weight: 300;
+      color: var(--text);
+      background: linear-gradient(#f2f2f4 0, #e5e5e8 170px, #ededf0 100%);
+    }
+    body { padding-bottom: 76px; }
+    button, input, select { font-family: inherit; }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      padding-top: env(safe-area-inset-top);
+      background: linear-gradient(rgba(252,252,253,.96), rgba(225,225,229,.94));
+      backdrop-filter: blur(14px);
+      border-bottom: .5px solid var(--line);
+      box-shadow: inset 0 1px rgba(255,255,255,.72);
+    }
+    .nav {
+      height: 48px;
+      max-width: 980px;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+    }
+    .brand { font-size: 20px; font-weight: 300; letter-spacing: -.25px; }
+    .nav button, .linkbtn {
+      border: 0;
+      background: none;
+      color: #718eae;
+      font: inherit;
+      font-weight: 300;
+      padding: 8px;
+      cursor: pointer;
+      text-shadow: 0 1px rgba(255,255,255,.75);
+    }
+    .hero { max-width: 980px; margin: 0 auto; padding: 20px 14px 10px; }
+    .hero h1 {
+      margin: 0 0 4px;
+      font-size: 34px;
+      line-height: 1.05;
+      font-weight: 300;
+      letter-spacing: -1.2px;
+      color: #5b5b60;
+    }
+    .hero p { margin: 0; color: var(--muted); font-weight: 300; }
+    .search-panel { max-width: 980px; margin: 0 auto 14px; padding: 0 14px; }
+    .searchbar {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 10px;
+      border: .5px solid rgba(90,90,95,.20);
+      border-radius: 9px;
+      background: linear-gradient(#d8d8dc, #eeeeef);
+      box-shadow: inset 0 1px rgba(255,255,255,.68);
+    }
+    .searchbar:before { content: '⌕'; font-size: 21px; font-weight: 300; color: #8c8c91; }
+    .searchbar input {
+      width: 100%;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: #5f5f64;
+      font-size: 17px;
+      font-weight: 300;
+    }
+    input::placeholder { color: #9b9ba0; }
+    .filters { display: grid; grid-template-columns: 2fr 1.2fr 1fr 1fr auto; gap: 8px; margin-top: 10px; }
+    .filters input, .filters select, .filters button {
+      min-height: 38px;
+      padding: 0 10px;
+      border: .5px solid var(--line);
+      border-radius: 7px;
+      background: linear-gradient(#fbfbfc, #e9e9ec);
+      color: #68686d;
+      font-size: 14px;
+      font-weight: 300;
+      box-shadow: inset 0 1px rgba(255,255,255,.78);
+    }
+    .filters button {
+      background: linear-gradient(#91adca, #708fb2);
+      border-color: rgba(65,91,120,.34);
+      color: #fff;
+      font-weight: 400;
+      text-shadow: 0 -1px rgba(0,0,0,.12);
+    }
+    .check { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 13px; font-weight: 300; }
+    .check input { min-height: auto; }
+    #content {
+      max-width: 980px;
+      margin: auto;
+      background: linear-gradient(#fafafa, #f2f2f4);
+      border-top: .5px solid var(--line);
+      border-bottom: .5px solid var(--line);
+      box-shadow: inset 0 1px rgba(255,255,255,.72);
+    }
+    .entry {
+      display: flex;
+      gap: 14px;
+      min-height: 104px;
+      padding: 14px;
+      position: relative;
+      background: linear-gradient(rgba(255,255,255,.72), rgba(243,243,245,.74));
+    }
+    .entry:not(:last-child):after {
+      content: '';
+      position: absolute;
+      left: 92px;
+      right: 0;
+      bottom: 0;
+      height: .5px;
+      background: var(--line-soft);
+    }
+    .entry > div:first-child { width: 64px; flex: 0 0 64px; text-align: center; }
+    .entry img {
+      width: 64px;
+      height: 64px;
+      border: .5px solid rgba(0,0,0,.11);
+      border-radius: 14px;
+      object-fit: cover;
+      background: linear-gradient(#f5f5f6, #dddde0);
+      box-shadow: inset 0 1px rgba(255,255,255,.72);
+    }
+    .entry .info { min-width: 0; flex: 1; }
+    .entry h4 { margin: 1px 0 5px; color: #59595e; font-size: 17px; font-weight: 300; }
+    .entry .info div { color: var(--muted); font-size: 13px; font-weight: 300; line-height: 1.45; overflow-wrap: anywhere; }
+    .entry button {
+      margin-top: 7px;
+      padding: 5px 13px;
+      border: .5px solid rgba(95,95,100,.16);
+      border-radius: 14px;
+      background: linear-gradient(#f7f7f8, #dddde1);
+      color: #6d8eaf;
+      font-weight: 400;
+      cursor: pointer;
+      box-shadow: inset 0 1px rgba(255,255,255,.78);
+    }
+    .entry a, .itunes a, .randomAction button { color: #6d8eaf; cursor: pointer; text-decoration: none; font-weight: 300; }
+    .itunes {
+      padding: 18px 14px;
+      border-top: .5px solid var(--line);
+      background: linear-gradient(#fafafa, #f0f0f2);
+      font-size: 14px;
+      font-weight: 300;
+      line-height: 1.45;
+    }
+    .itunes h4 { margin: 0 0 10px; color: #5b5b60; font-size: 20px; font-weight: 300; }
+    .itunes p { color: #67676c; white-space: pre-wrap; }
+    .screenshot { display: inline-block; margin: 10px; }
+    .screenshot img { max-width: 220px; max-height: 390px; border: .5px solid var(--line); border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,.14); }
+    .randomAction { padding: 14px; border-top: .5px solid var(--line); background: linear-gradient(#f9f9fa, #ececef); }
+    .randomAction button { border: 0; background: none; font-size: 15px; }
+    .no-itunes { padding: 20px; text-align: center; background: linear-gradient(#fafafa, #f0f0f2); color: var(--muted); }
+    #overlay { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 20px; background: rgba(65,65,70,.30); }
+    #overlay[hidden] { display: none; }
+    #installMsg {
+      width: min(460px, 100%);
+      padding: 20px;
+      border: .5px solid rgba(70,70,75,.18);
+      border-radius: 14px;
+      background: linear-gradient(#fbfbfc, #e9e9ec);
+      box-shadow: 0 18px 50px rgba(0,0,0,.25), inset 0 1px rgba(255,255,255,.78);
+    }
+    #installMsg h3 { margin: 0 0 8px; font-size: 21px; font-weight: 300; }
+    #installMsg p { color: var(--muted); font-weight: 300; line-height: 1.45; }
+    #installMsg input {
+      width: 100%;
+      height: 40px;
+      margin: 6px 0 12px;
+      padding: 0 10px;
+      border: .5px solid var(--line);
+      border-radius: 8px;
+      background: linear-gradient(#fff, #f0f0f2);
+      font-size: 16px;
+      font-weight: 300;
+    }
+    #installMsg button {
+      padding: 9px 14px;
+      border: .5px solid rgba(65,91,120,.32);
+      border-radius: 8px;
+      background: linear-gradient(#91adca, #708fb2);
+      color: #fff;
+      font-weight: 400;
+    }
+    #installMsg button[type=button] { border-color: rgba(80,80,85,.22); background: linear-gradient(#a9a9ad, #88888d); }
+    .tabbar {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 30;
+      padding-bottom: env(safe-area-inset-bottom);
+      border-top: .5px solid var(--line);
+      background: linear-gradient(rgba(249,249,250,.96), rgba(220,220,224,.96));
+      backdrop-filter: blur(14px);
+      box-shadow: inset 0 1px rgba(255,255,255,.72);
+    }
+    .tabs { height: 54px; max-width: 560px; margin: auto; display: flex; justify-content: space-around; align-items: center; }
+    .tab { color: #919196; text-align: center; font-size: 10px; font-weight: 300; }
+    .tab b { display: block; font-size: 22px; font-weight: 300; line-height: 22px; }
+    .tab.active { color: #6d8eaf; }
+    @media (max-width: 720px) {
+      .filters { grid-template-columns: 1fr 1fr; }
+      .filters .wide { grid-column: 1 / -1; }
+      .hero h1 { font-size: 30px; }
+    }
+    @media (min-width: 981px) {
+      #content { overflow: hidden; border: .5px solid var(--line); border-radius: 12px; }
+      .search-panel { padding-top: 4px; }
+    }
+  </style>
 </head>
-
 <body>
-	<button style="float: right; margin: 0 16px" onclick="randomIPA()">Random</button>
-	<h1>IPA Archive</h1>
-	<form onsubmit="event.preventDefault(); searchIPA(); return false;" autocomplete="off">
-		<input id="page" hidden>
-		<input id="minid" hidden>
-		<label for="search">Search: <input id="search" placeholder="Search"></label>
-		<label for="bundleid">BundleId: <input id="bundleid" placeholder="com.gameloft."></label>
-		<label for="unique">Unique: <input id="unique" type="checkbox" checked></label>
-		<label for="minos">min OS: <input id="minos" placeholder="1.0"></label>
-		<label for="maxos">max OS: <input id="maxos" placeholder="5.1.1"></label>
-		<label for="device">Device: <select id="device">
-				<option value="">Any</option>
-				<option value="1">iPhone</option>
-				<option value="2">iPad</option>
-				<option value="3">TV</option>
-				<option value="4">Watch</option>
-			</select></label>
-		<button type="submit">Search</button>
-	</form>
-
-	<div id="content">JavaScript disabled?</div>
-
-	<div id="templates" hidden>
-		<div class="entry full">
-			<div>
-				<img XSRC="$IMG" onerror="onImgError(this)">
-				<button onclick="installIPA($IDX)">Install</button>
-			</div>
-			<div class="info">
-				<h4>$TITLE</h4>
-				<div>BundleId: $BUNDLEID</div>
-				<div>Version: v$VERSION – $SIZE</div>
-				<div>Device: $PLATFORM</div>
-				<div>Minimum OS: $MINOS</div>
-				<div>Link: <a href="$URL" rel="noopener noreferrer nofollow">$URLNAME</a></div>
-			</div>
-		</div>
-		<div class="entry short">
-			<div><img XSRC="$IMG" onerror="onImgError(this)"></div>
-			<div class="info">
-				<h4>$TITLE</h4>
-				<div>BundleId: $BUNDLEID</div>
-				<div>Device: $PLATFORM</div>
-				<div>Minimum OS: $MINOS</div>
-				<div><a onclick="searchBundle($IDX)">Show all</a></div>
-			</div>
-		</div>
-		<div class="itunes">
-			<h4>iTunes Info:</h4>
-			<div>Genre: $GENRES</div>
-			<div>Rating: $RATING</div>
-			<div>Advisory: $ADVISORY</div>
-			<br>
-			<div>Current Version: <b>$VERSION</b> (last update: $DATE)</div>
-			<div>Price: $PRICE</div>
-			<div>Link: <a href="$URL" rel="noopener noreferrer nofollow">iTunes</a></div>
-			<div>$IMG</div>
-			<p>$DESCRIPTION</p>
-		</div>
-		<a class="screenshot" href="$REF" target="_blank"><img XSRC="$URL" crossorigin="anonymous"
-				referrerpolicy="no-referrer"></a>
-		<div class="randomAction">
-			Actions:
-			<button onclick="searchBundle($IDX, '&random=$IDX')">Show all versions</button>
-			<button onclick="randomIPA()">Next Random</button>
-		</div>
-		<div class="no-itunes">
-			<p>iTunes search disabled. No plist server configured.</p>
-			<a onclick="installIPA()">Configure now</a>
-		</div>
-	</div>
-
-	<div id="overlay" hidden>
-		<div id="installMsg">
-			<h3>Install on device</h3>
-			<p>
-				Unfortunatelly, this function is not possible with static HTML+JS.
-				You must provided a plist generator URL.
-				See <a href="https://github.com/stuffed18/ipa-archive-updated?tab=readme-ov-file#starting-plist-server" target="_blank">Readme</a> file for further instructions on how to set up such a
-				service.
-			</p>
-			<form onsubmit="event.preventDefault(); setPlistGen(); return false;" autocomplete="off">
-				<label for="plistServer">Generator URL:</label>
-				<input id="plistServer" placeholder="http://192.168.0.1/">
-				<button type="submit">Save</button>
-				<button type="button" onclick="document.getElementById('overlay').hidden=true">Abort</button>
-			</form>
-		</div>
-	</div>
-
-	<script>loadDB()</script>
+  <header class="topbar"><div class="nav"><button class="linkbtn" onclick="history.back()">‹ Back</button><div class="brand">LegStore</div><button onclick="randomIPA()">Random</button></div></header>
+  <section class="hero"><h1>Featured</h1><p>Legacy apps, preserved and ready to explore.</p></section>
+  <section class="search-panel">
+    <form onsubmit="event.preventDefault();searchIPA();return false" autocomplete="off">
+      <input id="page" hidden><input id="minid" hidden>
+      <label class="searchbar"><input id="search" aria-label="Search apps" placeholder="Search LegStore"></label>
+      <div class="filters">
+        <input class="wide" id="bundleid" aria-label="Bundle ID" placeholder="Bundle ID (com.example.app)">
+        <input id="minos" aria-label="Minimum iOS" placeholder="Min iOS">
+        <input id="maxos" aria-label="Maximum iOS" placeholder="Max iOS">
+        <select id="device" aria-label="Device"><option value="">Any device</option><option value="1">iPhone</option><option value="2">iPad</option><option value="3">Apple TV</option><option value="4">Apple Watch</option></select>
+        <button type="submit">Search</button>
+      </div>
+      <label class="check"><input id="unique" type="checkbox" checked> Show one result per app</label>
+    </form>
+  </section>
+  <main id="content" aria-live="polite">Loading LegStore…</main>
+  <div id="templates" hidden>
+    <div class="entry full"><div><img XSRC="$IMG" onerror="onImgError(this)"><button onclick="installIPA($IDX)">GET</button></div><div class="info"><h4>$TITLE</h4><div>$BUNDLEID</div><div>Version $VERSION · $SIZE</div><div>$PLATFORM · Requires iOS $MINOS</div><div><a href="$URL" rel="noopener noreferrer nofollow">$URLNAME</a></div></div></div>
+    <div class="entry short"><div><img XSRC="$IMG" onerror="onImgError(this)"></div><div class="info"><h4>$TITLE</h4><div>$BUNDLEID</div><div>$PLATFORM · Requires iOS $MINOS</div><div><a onclick="searchBundle($IDX)">All versions</a></div></div></div>
+    <div class="itunes"><h4>App Information</h4><div>Genre: $GENRES</div><div>Rating: $RATING</div><div>Advisory: $ADVISORY</div><br><div>Latest archived version: <b>$VERSION</b> · $DATE</div><div>Original price: $PRICE</div><div><a href="$URL" rel="noopener noreferrer nofollow">View original App Store page</a></div><div>$IMG</div><p>$DESCRIPTION</p></div>
+    <a class="screenshot" href="$REF" target="_blank"><img XSRC="$URL" crossorigin="anonymous" referrerpolicy="no-referrer"></a>
+    <div class="randomAction"><button onclick="searchBundle($IDX,'&random=$IDX')">Show all versions</button><button onclick="randomIPA()">Next random app</button></div>
+    <div class="no-itunes"><p>App Store metadata is unavailable because no plist server is configured.</p><a onclick="installIPA()">Configure installation</a></div>
+  </div>
+  <div id="overlay" hidden><div id="installMsg"><h3>Install on device</h3><p>Static HTML cannot generate the installation manifest by itself. Enter the URL of your plist generator service.</p><form onsubmit="event.preventDefault();setPlistGen();return false" autocomplete="off"><label for="plistServer">Generator URL</label><input id="plistServer" placeholder="https://example.com/"><button type="submit">Save</button> <button type="button" onclick="document.getElementById('overlay').hidden=true">Cancel</button></form></div></div>
+  <nav class="tabbar" aria-label="Primary"><div class="tabs"><div class="tab active"><b>★</b>Featured</div><div class="tab"><b>▦</b>Categories</div><div class="tab" onclick="randomIPA()"><b>♻</b>Random</div><div class="tab"><b>⌕</b>Search</div></div></nav>
+  <script>window.addEventListener('DOMContentLoaded',()=>{if(typeof loadDB==='function')loadDB()})</script>
 </body>
-
 </html>
