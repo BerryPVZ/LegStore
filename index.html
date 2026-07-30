@@ -235,26 +235,278 @@
       #content { overflow: hidden; border: .5px solid var(--line); border-radius: 12px; }
       .search-panel { padding-top: 4px; }
     }
+
+    /* Friendly controls and archive tools */
+    .search-wrap { position: relative; }
+    .searchbar { padding-right: 6px; }
+    .searchbar .clear-search {
+      display: none;
+      flex: 0 0 auto;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      background: linear-gradient(#a9a9ae, #8d8d92);
+      color: #f8f8f9;
+      font-size: 17px;
+      font-weight: 300;
+      line-height: 22px;
+      cursor: pointer;
+      text-shadow: 0 -1px rgba(0,0,0,.12);
+    }
+    .searchbar.has-text .clear-search { display: block; }
+    .search-history {
+      position: absolute;
+      top: calc(100% + 5px);
+      left: 0;
+      right: 0;
+      z-index: 40;
+      overflow: hidden;
+      border: .5px solid var(--line);
+      border-radius: 9px;
+      background: linear-gradient(rgba(252,252,253,.98), rgba(235,235,238,.98));
+      box-shadow: 0 9px 24px rgba(0,0,0,.16), inset 0 1px rgba(255,255,255,.8);
+    }
+    .search-history[hidden] { display: none; }
+    .history-head, .history-item {
+      min-height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 7px 11px;
+      border-bottom: .5px solid var(--line-soft);
+      color: #747479;
+      font-size: 13px;
+      font-weight: 300;
+    }
+    .history-item { width: 100%; border-left: 0; border-right: 0; border-top: 0; background: transparent; text-align: left; cursor: pointer; }
+    .history-item:last-child { border-bottom: 0; }
+    .history-item:hover, .history-item:focus { background: rgba(109,143,180,.10); outline: none; }
+    .history-item span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .history-head button { border: 0; background: none; color: var(--blue); font-size: 12px; cursor: pointer; }
+    .filter-shell {
+      margin-top: 10px;
+      border: .5px solid var(--line);
+      border-radius: 9px;
+      background: linear-gradient(rgba(250,250,251,.8), rgba(231,231,234,.78));
+      box-shadow: inset 0 1px rgba(255,255,255,.78);
+    }
+    .filter-shell summary {
+      min-height: 39px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 11px;
+      list-style: none;
+      color: #727277;
+      font-size: 14px;
+      font-weight: 300;
+      cursor: pointer;
+    }
+    .filter-shell summary::-webkit-details-marker { display: none; }
+    .filter-shell summary:after { content: '⌄'; color: #97979c; font-size: 18px; transition: transform .18s ease; }
+    .filter-shell[open] summary:after { transform: rotate(180deg); }
+    .filter-body { padding: 0 9px 9px; border-top: .5px solid var(--line-soft); }
+    .filters { margin-top: 9px; }
+    .filter-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 8px; }
+    .reset-filters {
+      border: 0;
+      background: none;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 300;
+      cursor: pointer;
+    }
+    .device-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .device-chip {
+      min-height: 29px;
+      padding: 4px 11px;
+      border: .5px solid var(--line);
+      border-radius: 15px;
+      background: linear-gradient(#fafafb, #e3e3e6);
+      color: #77777c;
+      font-size: 12px;
+      font-weight: 300;
+      cursor: pointer;
+      box-shadow: inset 0 1px rgba(255,255,255,.78);
+    }
+    .device-chip.active { background: linear-gradient(#8faac6, #708eae); border-color: rgba(65,91,120,.30); color: #fff; text-shadow: 0 -1px rgba(0,0,0,.10); }
+    .results-tools {
+      max-width: 980px;
+      margin: 0 auto 8px;
+      padding: 0 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .results-status { min-width: 0; display: flex; align-items: center; flex-wrap: wrap; gap: 6px; color: var(--muted); font-size: 12px; }
+    .result-count { padding: 3px 8px; border: .5px solid var(--line); border-radius: 10px; background: linear-gradient(#fafafb, #e5e5e8); color: #6f6f74; }
+    .active-filter { max-width: 190px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 3px 8px; border-radius: 10px; background: rgba(109,143,180,.10); color: #718eae; }
+    .tool-controls { display: flex; align-items: center; gap: 6px; }
+    .tool-controls select, .view-toggle button {
+      min-height: 32px;
+      border: .5px solid var(--line);
+      background: linear-gradient(#fafafb, #e4e4e7);
+      color: #707075;
+      font-size: 12px;
+      font-weight: 300;
+      box-shadow: inset 0 1px rgba(255,255,255,.78);
+    }
+    .tool-controls select { padding: 0 25px 0 8px; border-radius: 7px; }
+    .view-toggle { display: flex; }
+    .view-toggle button { width: 34px; padding: 0; cursor: pointer; }
+    .view-toggle button:first-child { border-radius: 7px 0 0 7px; }
+    .view-toggle button:last-child { margin-left: -.5px; border-radius: 0 7px 7px 0; }
+    .view-toggle button.active { background: linear-gradient(#8faac6, #708eae); color: #fff; }
+    .entry { transition: opacity .16s ease, transform .16s ease; }
+    .entry-tools { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; margin-top: 7px; }
+    .entry-tools button {
+      min-height: 27px;
+      margin: 0;
+      padding: 4px 9px;
+      border-radius: 13px;
+      font-size: 12px;
+      font-weight: 300;
+    }
+    .favorite-btn.active { background: linear-gradient(#9eb4cb, #7894b2); color: #fff; border-color: rgba(65,91,120,.28); }
+    .bundle-copy { cursor: pointer; }
+    #content.grid-view {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: .5px;
+      background: var(--line-soft);
+    }
+    #content.grid-view .entry {
+      min-height: 226px;
+      display: block;
+      padding: 16px;
+      text-align: center;
+      background: linear-gradient(#fbfbfc, #ededf0);
+    }
+    #content.grid-view .entry:after { display: none; }
+    #content.grid-view .entry > div:first-child { width: auto; text-align: center; }
+    #content.grid-view .entry img { width: 82px; height: 82px; border-radius: 18px; }
+    #content.grid-view .entry .info { margin-top: 9px; }
+    #content.grid-view .entry .info div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #content.grid-view .entry-tools { justify-content: center; }
+    #content.grid-view > :not(.entry) { grid-column: 1 / -1; }
+    .empty-state { padding: 50px 20px; text-align: center; color: var(--muted); background: linear-gradient(#fafafa, #f0f0f2); }
+    .empty-state b { display: block; margin-bottom: 6px; color: #66666b; font-size: 19px; font-weight: 300; }
+    .empty-state button { margin-top: 12px; padding: 7px 13px; border: .5px solid var(--line); border-radius: 14px; background: linear-gradient(#fafafb, #e3e3e6); color: var(--blue); cursor: pointer; }
+    .favorite-count { min-width: 17px; display: inline-block; padding: 1px 5px; border-radius: 9px; background: rgba(109,143,180,.16); font-size: 9px; }
+    .tab { cursor: pointer; user-select: none; }
+    .tab[aria-current='page'] { color: #6d8eaf; }
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(69px + env(safe-area-inset-bottom));
+      z-index: 80;
+      max-width: min(420px, calc(100% - 28px));
+      padding: 9px 14px;
+      border: .5px solid rgba(50,50,55,.22);
+      border-radius: 16px;
+      background: linear-gradient(rgba(82,82,87,.94), rgba(56,56,61,.94));
+      color: #fff;
+      font-size: 13px;
+      font-weight: 300;
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, 10px);
+      transition: opacity .18s ease, transform .18s ease;
+      box-shadow: 0 5px 18px rgba(0,0,0,.22);
+    }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+    .back-top {
+      position: fixed;
+      right: 14px;
+      bottom: calc(72px + env(safe-area-inset-bottom));
+      z-index: 29;
+      width: 36px;
+      height: 36px;
+      border: .5px solid var(--line);
+      border-radius: 50%;
+      background: linear-gradient(rgba(250,250,251,.96), rgba(220,220,224,.96));
+      color: #747479;
+      font-size: 18px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s ease;
+      box-shadow: 0 3px 12px rgba(0,0,0,.13), inset 0 1px rgba(255,255,255,.75);
+      cursor: pointer;
+    }
+    .back-top.show { opacity: 1; pointer-events: auto; }
+    @media (max-width: 720px) {
+      .results-tools { align-items: flex-start; flex-direction: column; }
+      .tool-controls { width: 100%; }
+      .tool-controls select { flex: 1; }
+      .filter-footer { align-items: flex-start; flex-direction: column; }
+      #content.grid-view { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      #content.grid-view .entry { min-height: 242px; padding: 13px 8px; }
+      #content.grid-view .entry img { width: 70px; height: 70px; }
+      #content.grid-view .entry-tools button { padding: 4px 7px; }
+    }
+    @media (max-width: 390px) {
+      #content.grid-view { grid-template-columns: 1fr; }
+    }
+
   </style>
 </head>
 <body>
   <header class="topbar"><div class="nav"><button class="linkbtn" onclick="history.back()">‹ Back</button><div class="brand">LegStore</div><button onclick="randomIPA()">Random</button></div></header>
   <section class="hero"><h1>Featured</h1><p>Legacy apps, preserved and ready to explore.</p></section>
   <section class="search-panel">
-    <form onsubmit="event.preventDefault();searchIPA();return false" autocomplete="off">
+    <form id="legstoreSearchForm" onsubmit="event.preventDefault();legStoreSubmitSearch();return false" autocomplete="off">
       <input id="page" hidden><input id="minid" hidden>
-      <label class="searchbar"><input id="search" aria-label="Search apps" placeholder="Search LegStore"></label>
-      <div class="filters">
-        <input class="wide" id="bundleid" aria-label="Bundle ID" placeholder="Bundle ID (com.example.app)">
-        <input id="minos" aria-label="Minimum iOS" placeholder="Min iOS">
-        <input id="maxos" aria-label="Maximum iOS" placeholder="Max iOS">
-        <select id="device" aria-label="Device"><option value="">Any device</option><option value="1">iPhone</option><option value="2">iPad</option><option value="3">Apple TV</option><option value="4">Apple Watch</option></select>
-        <button type="submit">Search</button>
+      <div class="search-wrap">
+        <label class="searchbar" id="searchbar"><input id="search" aria-label="Search apps" placeholder="Search LegStore"><button class="clear-search" id="clearSearch" type="button" aria-label="Clear search">×</button></label>
+        <div class="search-history" id="searchHistory" hidden></div>
       </div>
-      <label class="check"><input id="unique" type="checkbox" checked> Show one result per app</label>
+      <div class="device-chips" aria-label="Quick device filters">
+        <button class="device-chip active" type="button" data-device="">All</button>
+        <button class="device-chip" type="button" data-device="1">iPhone</button>
+        <button class="device-chip" type="button" data-device="2">iPad</button>
+        <button class="device-chip" type="button" data-device="3">Apple TV</button>
+        <button class="device-chip" type="button" data-device="4">Apple Watch</button>
+      </div>
+      <details class="filter-shell" id="advancedFilters">
+        <summary><span>Advanced filters</span></summary>
+        <div class="filter-body">
+          <div class="filters">
+            <input class="wide" id="bundleid" aria-label="Bundle ID" placeholder="Bundle ID (com.example.app)">
+            <input id="minos" aria-label="Minimum iOS" placeholder="Min iOS">
+            <input id="maxos" aria-label="Maximum iOS" placeholder="Max iOS">
+            <select id="device" aria-label="Device"><option value="">Any device</option><option value="1">iPhone</option><option value="2">iPad</option><option value="3">Apple TV</option><option value="4">Apple Watch</option></select>
+            <button type="submit">Search</button>
+          </div>
+          <div class="filter-footer">
+            <label class="check"><input id="unique" type="checkbox" checked> Show one result per app</label>
+            <button class="reset-filters" type="button" id="resetFilters">Reset all filters</button>
+          </div>
+        </div>
+      </details>
     </form>
   </section>
-  <main id="content" aria-live="polite">Loading LegStore…</main>
+  <section class="results-tools" aria-label="Result controls">
+    <div class="results-status"><span class="result-count" id="resultCount">Loading…</span><span id="activeFilters"></span></div>
+    <div class="tool-controls">
+      <select id="sortResults" aria-label="Sort results">
+        <option value="default">Archive order</option>
+        <option value="name-asc">Name A–Z</option>
+        <option value="name-desc">Name Z–A</option>
+        <option value="ios-asc">Lowest iOS first</option>
+        <option value="ios-desc">Highest iOS first</option>
+      </select>
+      <div class="view-toggle" aria-label="Result view">
+        <button type="button" id="listView" class="active" aria-label="List view" title="List view">☷</button>
+        <button type="button" id="gridView" aria-label="Grid view" title="Grid view">▦</button>
+      </div>
+    </div>
+  </section>
+  <main id="content" aria-live="polite" aria-busy="true">Loading LegStore…</main>
   <div id="templates" hidden>
     <div class="entry full"><div><img XSRC="$IMG" onerror="onImgError(this)"><button onclick="installIPA($IDX)">GET</button></div><div class="info"><h4>$TITLE</h4><div>$BUNDLEID</div><div>Version $VERSION · $SIZE</div><div>$PLATFORM · Requires iOS $MINOS</div><div><a href="$URL" rel="noopener noreferrer nofollow">$URLNAME</a></div></div></div>
     <div class="entry short"><div><img XSRC="$IMG" onerror="onImgError(this)"></div><div class="info"><h4>$TITLE</h4><div>$BUNDLEID</div><div>$PLATFORM · Requires iOS $MINOS</div><div><a onclick="searchBundle($IDX)">All versions</a></div></div></div>
@@ -264,7 +516,512 @@
     <div class="no-itunes"><p>App Store metadata is unavailable because no plist server is configured.</p><a onclick="installIPA()">Configure installation</a></div>
   </div>
   <div id="overlay" hidden><div id="installMsg"><h3>Install on device</h3><p>Static HTML cannot generate the installation manifest by itself. Enter the URL of your plist generator service.</p><form onsubmit="event.preventDefault();setPlistGen();return false" autocomplete="off"><label for="plistServer">Generator URL</label><input id="plistServer" placeholder="https://example.com/"><button type="submit">Save</button> <button type="button" onclick="document.getElementById('overlay').hidden=true">Cancel</button></form></div></div>
-  <nav class="tabbar" aria-label="Primary"><div class="tabs"><div class="tab active"><b>★</b>Featured</div><div class="tab"><b>▦</b>Categories</div><div class="tab" onclick="randomIPA()"><b>♻</b>Random</div><div class="tab"><b>⌕</b>Search</div></div></nav>
-  <script>window.addEventListener('DOMContentLoaded',()=>{if(typeof loadDB==='function')loadDB()})</script>
+  <nav class="tabbar" aria-label="Primary"><div class="tabs"><div class="tab active" id="featuredTab" aria-current="page"><b>★</b>Featured</div><div class="tab" id="favoritesTab"><b>♡</b>Favorites <span class="favorite-count" id="favoriteCount">0</span></div><div class="tab" id="randomTab"><b>♻</b>Random</div><div class="tab" id="searchTab"><b>⌕</b>Search</div></div></nav>
+  <button class="back-top" id="backTop" type="button" aria-label="Back to top">↑</button>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script>
+    (() => {
+      'use strict';
+
+      const STORE_KEYS = {
+        favorites: 'legstore.favorites.v1',
+        history: 'legstore.searchHistory.v1',
+        view: 'legstore.view.v1'
+      };
+
+      const state = {
+        showingFavorites: false,
+        enhancing: false,
+        lastArchiveHTML: '',
+        lastCount: -1,
+        toastTimer: 0
+      };
+
+      const $ = id => document.getElementById(id);
+      const content = $('content');
+      const search = $('search');
+      const searchbar = $('searchbar');
+      const searchHistory = $('searchHistory');
+      const device = $('device');
+      const resultCount = $('resultCount');
+      const activeFilters = $('activeFilters');
+
+      function readJSON(key, fallback) {
+        try {
+          const value = JSON.parse(localStorage.getItem(key));
+          return value ?? fallback;
+        } catch (_) {
+          return fallback;
+        }
+      }
+
+      function writeJSON(key, value) {
+        try { localStorage.setItem(key, JSON.stringify(value)); } catch (_) {}
+      }
+
+      function escapeHTML(value) {
+        return String(value ?? '').replace(/[&<>'"]/g, char => ({
+          '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+        })[char]);
+      }
+
+      function showToast(message) {
+        const toast = $('toast');
+        toast.textContent = message;
+        toast.classList.add('show');
+        clearTimeout(state.toastTimer);
+        state.toastTimer = setTimeout(() => toast.classList.remove('show'), 1800);
+      }
+
+      function getEntries() {
+        return Array.from(content.querySelectorAll(':scope > .entry'));
+      }
+
+      function getEntryData(entry) {
+        const info = entry.querySelector('.info');
+        const lines = info ? Array.from(info.children).filter(node => node.tagName !== 'H4' && !node.classList.contains('entry-tools')) : [];
+        const title = entry.querySelector('h4')?.textContent.trim() || 'Untitled App';
+        const bundle = lines[0]?.textContent.trim() || '';
+        const versionLine = lines.find(node => /Version\s/i.test(node.textContent))?.textContent.trim() || '';
+        const platformLine = lines.find(node => /Requires iOS/i.test(node.textContent))?.textContent.trim() || '';
+        const version = versionLine.match(/Version\s+([^·]+)/i)?.[1]?.trim() || '';
+        const minOS = platformLine.match(/Requires iOS\s+([\d.]+)/i)?.[1] || '';
+        const platform = platformLine.split('·')[0]?.trim() || '';
+        const image = entry.querySelector('img')?.getAttribute('src') || entry.querySelector('img')?.getAttribute('XSRC') || '';
+        return { title, bundle, version, minOS, platform, image };
+      }
+
+      function favoriteKey(data) {
+        return `${data.bundle || data.title}::${data.version || ''}`.toLowerCase();
+      }
+
+      function getFavorites() {
+        const saved = readJSON(STORE_KEYS.favorites, []);
+        return Array.isArray(saved) ? saved : [];
+      }
+
+      function saveFavorites(favorites) {
+        writeJSON(STORE_KEYS.favorites, favorites);
+        updateFavoriteCount();
+      }
+
+      function isFavorite(data) {
+        const key = favoriteKey(data);
+        return getFavorites().some(item => item.key === key);
+      }
+
+      function toggleFavorite(data, button) {
+        let favorites = getFavorites();
+        const key = favoriteKey(data);
+        const index = favorites.findIndex(item => item.key === key);
+        if (index >= 0) {
+          favorites.splice(index, 1);
+          button?.classList.remove('active');
+          if (button) button.textContent = '♡ Save';
+          showToast('Removed from Favorites');
+        } else {
+          favorites.unshift({ ...data, key, savedAt: Date.now() });
+          favorites = favorites.slice(0, 200);
+          button?.classList.add('active');
+          if (button) button.textContent = '♥ Saved';
+          showToast('Saved to Favorites');
+        }
+        saveFavorites(favorites);
+        if (state.showingFavorites) renderFavorites();
+      }
+
+      function updateFavoriteCount() {
+        $('favoriteCount').textContent = String(getFavorites().length);
+      }
+
+      async function copyText(text, successMessage) {
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch (_) {
+          const box = document.createElement('textarea');
+          box.value = text;
+          box.style.position = 'fixed';
+          box.style.opacity = '0';
+          document.body.appendChild(box);
+          box.select();
+          document.execCommand('copy');
+          box.remove();
+        }
+        showToast(successMessage);
+      }
+
+      async function shareApp(data) {
+        const text = `${data.title}${data.version ? ` ${data.version}` : ''}${data.bundle ? ` — ${data.bundle}` : ''}`;
+        if (navigator.share) {
+          try {
+            await navigator.share({ title: data.title, text, url: location.href });
+            return;
+          } catch (error) {
+            if (error?.name === 'AbortError') return;
+          }
+        }
+        await copyText(`${text}
+${location.href}`, 'App details copied');
+      }
+
+      function enhanceEntry(entry) {
+        if (entry.dataset.legstoreEnhanced === '1') return;
+        if (!entry.dataset.archiveOrder) entry.dataset.archiveOrder = String(getEntries().indexOf(entry));
+        entry.dataset.legstoreEnhanced = '1';
+        const data = getEntryData(entry);
+        entry.dataset.title = data.title.toLowerCase();
+        entry.dataset.minOs = data.minOS || '0';
+        entry.dataset.favoriteKey = favoriteKey(data);
+
+        const info = entry.querySelector('.info');
+        if (!info) return;
+        const actions = document.createElement('div');
+        actions.className = 'entry-tools';
+
+        const favorite = document.createElement('button');
+        favorite.type = 'button';
+        favorite.className = `favorite-btn${isFavorite(data) ? ' active' : ''}`;
+        favorite.textContent = isFavorite(data) ? '♥ Saved' : '♡ Save';
+        favorite.addEventListener('click', event => {
+          event.stopPropagation();
+          toggleFavorite(data, favorite);
+        });
+        actions.appendChild(favorite);
+
+        if (data.bundle) {
+          const copy = document.createElement('button');
+          copy.type = 'button';
+          copy.className = 'bundle-copy';
+          copy.textContent = 'Copy ID';
+          copy.addEventListener('click', event => {
+            event.stopPropagation();
+            copyText(data.bundle, 'Bundle ID copied');
+          });
+          actions.appendChild(copy);
+        }
+
+        const share = document.createElement('button');
+        share.type = 'button';
+        share.textContent = 'Share';
+        share.addEventListener('click', event => {
+          event.stopPropagation();
+          shareApp(data);
+        });
+        actions.appendChild(share);
+        info.appendChild(actions);
+      }
+
+      function updateCount() {
+        const count = getEntries().length;
+        resultCount.textContent = `${count.toLocaleString()} app${count === 1 ? '' : 's'}`;
+        content.setAttribute('aria-busy', 'false');
+        state.lastCount = count;
+      }
+
+      function parseVersion(value) {
+        return String(value || '0').split('.').map(part => Number.parseInt(part, 10) || 0);
+      }
+
+      function compareVersions(a, b) {
+        const aa = parseVersion(a);
+        const bb = parseVersion(b);
+        const length = Math.max(aa.length, bb.length);
+        for (let i = 0; i < length; i++) {
+          if ((aa[i] || 0) !== (bb[i] || 0)) return (aa[i] || 0) - (bb[i] || 0);
+        }
+        return 0;
+      }
+
+      function sortEntries() {
+        if (state.showingFavorites) return;
+        const value = $('sortResults').value;
+        const current = getEntries();
+        if (!current.length) return;
+        const sorted = [...current].sort((a, b) => {
+          if (value === 'default') return Number(a.dataset.archiveOrder || 0) - Number(b.dataset.archiveOrder || 0);
+          if (value === 'name-asc') return a.dataset.title.localeCompare(b.dataset.title);
+          if (value === 'name-desc') return b.dataset.title.localeCompare(a.dataset.title);
+          if (value === 'ios-asc') return compareVersions(a.dataset.minOs, b.dataset.minOs);
+          if (value === 'ios-desc') return compareVersions(b.dataset.minOs, a.dataset.minOs);
+          return 0;
+        });
+        if (sorted.every((entry, index) => entry === current[index])) return;
+        state.enhancing = true;
+        const marker = document.createComment('sorted entries');
+        content.insertBefore(marker, current[0]);
+        sorted.forEach(entry => content.insertBefore(entry, marker));
+        marker.remove();
+        state.enhancing = false;
+      }
+
+      function serializeArchive() {
+        const clone = content.cloneNode(true);
+        clone.querySelectorAll('.entry-tools').forEach(node => node.remove());
+        clone.querySelectorAll('.entry').forEach(entry => {
+          delete entry.dataset.legstoreEnhanced;
+          delete entry.dataset.title;
+          delete entry.dataset.minOs;
+          delete entry.dataset.favoriteKey;
+        });
+        return clone.innerHTML;
+      }
+
+      function setView(view) {
+        const grid = view === 'grid';
+        content.classList.toggle('grid-view', grid);
+        $('gridView').classList.toggle('active', grid);
+        $('listView').classList.toggle('active', !grid);
+        localStorage.setItem(STORE_KEYS.view, grid ? 'grid' : 'list');
+      }
+
+      function currentSearchSnapshot() {
+        const deviceText = device.options[device.selectedIndex]?.textContent || 'Any device';
+        return {
+          query: search.value.trim(),
+          bundle: $('bundleid').value.trim(),
+          minOS: $('minos').value.trim(),
+          maxOS: $('maxos').value.trim(),
+          device: device.value,
+          deviceText,
+          unique: $('unique').checked,
+          timestamp: Date.now()
+        };
+      }
+
+      function addSearchHistory() {
+        const item = currentSearchSnapshot();
+        if (!item.query && !item.bundle && !item.minOS && !item.maxOS && !item.device) return;
+        let history = readJSON(STORE_KEYS.history, []);
+        if (!Array.isArray(history)) history = [];
+        const signature = JSON.stringify([item.query, item.bundle, item.minOS, item.maxOS, item.device, item.unique]);
+        history = history.filter(old => JSON.stringify([old.query, old.bundle, old.minOS, old.maxOS, old.device, old.unique]) !== signature);
+        history.unshift(item);
+        writeJSON(STORE_KEYS.history, history.slice(0, 8));
+      }
+
+      function describeHistory(item) {
+        const parts = [];
+        if (item.query) parts.push(item.query);
+        if (item.bundle) parts.push(item.bundle);
+        if (item.device) parts.push(item.deviceText || 'Device');
+        if (item.minOS) parts.push(`iOS ${item.minOS}+`);
+        if (item.maxOS) parts.push(`up to ${item.maxOS}`);
+        return parts.join(' · ') || 'All apps';
+      }
+
+      function renderSearchHistory() {
+        const history = readJSON(STORE_KEYS.history, []);
+        if (!Array.isArray(history) || !history.length) {
+          searchHistory.hidden = true;
+          return;
+        }
+        searchHistory.innerHTML = '<div class="history-head"><span>Recent searches</span><button type="button" id="clearHistory">Clear</button></div>' + history.map((item, index) =>
+          `<button class="history-item" type="button" data-history-index="${index}"><span>${escapeHTML(describeHistory(item))}</span><small>›</small></button>`
+        ).join('');
+        searchHistory.hidden = false;
+        $('clearHistory')?.addEventListener('click', () => {
+          localStorage.removeItem(STORE_KEYS.history);
+          searchHistory.hidden = true;
+          showToast('Search history cleared');
+        });
+        searchHistory.querySelectorAll('[data-history-index]').forEach(button => {
+          button.addEventListener('click', () => {
+            const item = history[Number(button.dataset.historyIndex)];
+            if (!item) return;
+            search.value = item.query || '';
+            $('bundleid').value = item.bundle || '';
+            $('minos').value = item.minOS || '';
+            $('maxos').value = item.maxOS || '';
+            device.value = item.device || '';
+            $('unique').checked = item.unique !== false;
+            syncDeviceChips();
+            updateSearchUI();
+            searchHistory.hidden = true;
+            legStoreSubmitSearch();
+          });
+        });
+      }
+
+      function updateSearchUI() {
+        searchbar.classList.toggle('has-text', Boolean(search.value));
+        const chips = [];
+        const q = search.value.trim();
+        const bundle = $('bundleid').value.trim();
+        const min = $('minos').value.trim();
+        const max = $('maxos').value.trim();
+        if (q) chips.push(`Search: ${q}`);
+        if (bundle) chips.push(`ID: ${bundle}`);
+        if (device.value) chips.push(device.options[device.selectedIndex]?.textContent || 'Device');
+        if (min) chips.push(`iOS ${min}+`);
+        if (max) chips.push(`≤ iOS ${max}`);
+        activeFilters.innerHTML = chips.map(item => `<span class="active-filter">${escapeHTML(item)}</span>`).join('');
+      }
+
+      function syncDeviceChips() {
+        document.querySelectorAll('.device-chip').forEach(chip => chip.classList.toggle('active', chip.dataset.device === device.value));
+        updateSearchUI();
+      }
+
+      window.legStoreSubmitSearch = function legStoreSubmitSearch() {
+        state.showingFavorites = false;
+        setActiveTab('featuredTab');
+        addSearchHistory();
+        renderSearchHistory();
+        updateSearchUI();
+        content.setAttribute('aria-busy', 'true');
+        resultCount.textContent = 'Searching…';
+        if (typeof window.searchIPA === 'function') window.searchIPA();
+      };
+
+      function resetFilters(runSearch = true) {
+        search.value = '';
+        $('bundleid').value = '';
+        $('minos').value = '';
+        $('maxos').value = '';
+        device.value = '';
+        $('unique').checked = true;
+        $('sortResults').value = 'default';
+        syncDeviceChips();
+        updateSearchUI();
+        searchHistory.hidden = true;
+        if (runSearch) legStoreSubmitSearch();
+      }
+
+      function setActiveTab(id) {
+        document.querySelectorAll('.tab').forEach(tab => {
+          const active = tab.id === id;
+          tab.classList.toggle('active', active);
+          if (active) tab.setAttribute('aria-current', 'page'); else tab.removeAttribute('aria-current');
+        });
+      }
+
+      function renderFavorites() {
+        const favorites = getFavorites();
+        state.enhancing = true;
+        content.innerHTML = '';
+        if (!favorites.length) {
+          content.innerHTML = '<div class="empty-state"><b>No Favorites yet</b>Tap “Save” on any app to keep it here.<br><button type="button" id="browseApps">Browse apps</button></div>';
+          $('browseApps')?.addEventListener('click', showArchive);
+        } else {
+          favorites.forEach(item => {
+            const entry = document.createElement('div');
+            entry.className = 'entry full';
+            const image = item.image ? `<img src="${escapeHTML(item.image)}" onerror="if(typeof onImgError==='function')onImgError(this)">` : '<div style="width:64px;height:64px"></div>';
+            entry.innerHTML = `<div>${image}<button type="button" class="find-favorite">Find</button></div><div class="info"><h4>${escapeHTML(item.title)}</h4><div>${escapeHTML(item.bundle)}</div><div>Version ${escapeHTML(item.version || 'Unknown')}</div><div>${escapeHTML(item.platform || 'Legacy app')}${item.minOS ? ` · Requires iOS ${escapeHTML(item.minOS)}` : ''}</div></div>`;
+            entry.querySelector('.find-favorite')?.addEventListener('click', () => {
+              $('bundleid').value = item.bundle || '';
+              search.value = item.bundle ? '' : item.title;
+              $('advancedFilters').open = Boolean(item.bundle);
+              showArchive();
+              legStoreSubmitSearch();
+            });
+            content.appendChild(entry);
+          });
+        }
+        state.enhancing = false;
+        content.setAttribute('aria-busy', 'false');
+        getEntries().forEach(enhanceEntry);
+        updateCount();
+        setView(localStorage.getItem(STORE_KEYS.view) || 'list');
+      }
+
+      function showFavorites() {
+        if (!state.showingFavorites) state.lastArchiveHTML = serializeArchive();
+        state.showingFavorites = true;
+        setActiveTab('favoritesTab');
+        activeFilters.innerHTML = '<span class="active-filter">Saved apps</span>';
+        renderFavorites();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      function showArchive() {
+        state.showingFavorites = false;
+        setActiveTab('featuredTab');
+        if (state.lastArchiveHTML) {
+          state.enhancing = true;
+          content.innerHTML = state.lastArchiveHTML;
+          state.enhancing = false;
+          getEntries().forEach(enhanceEntry);
+          updateCount();
+          sortEntries();
+        } else if (typeof window.searchIPA === 'function') {
+          window.searchIPA();
+        }
+        updateSearchUI();
+      }
+
+      function afterContentChanged() {
+        if (state.enhancing || state.showingFavorites) return;
+        state.enhancing = true;
+        getEntries().forEach(enhanceEntry);
+        state.enhancing = false;
+        updateCount();
+        sortEntries();
+        state.lastArchiveHTML = serializeArchive();
+      }
+
+      const observer = new MutationObserver(() => {
+        if (state.enhancing) return;
+        clearTimeout(observer.timer);
+        observer.timer = setTimeout(afterContentChanged, 30);
+      });
+      observer.observe(content, { childList: true, subtree: true });
+
+      search.addEventListener('input', updateSearchUI);
+      search.addEventListener('focus', renderSearchHistory);
+      document.addEventListener('click', event => {
+        if (!event.target.closest('.search-wrap')) searchHistory.hidden = true;
+      });
+      $('clearSearch').addEventListener('click', () => {
+        search.value = '';
+        updateSearchUI();
+        search.focus();
+      });
+      $('resetFilters').addEventListener('click', () => resetFilters(true));
+      device.addEventListener('change', syncDeviceChips);
+      ['bundleid', 'minos', 'maxos'].forEach(id => $(id).addEventListener('input', updateSearchUI));
+      document.querySelectorAll('.device-chip').forEach(chip => chip.addEventListener('click', () => {
+        device.value = chip.dataset.device;
+        syncDeviceChips();
+        legStoreSubmitSearch();
+      }));
+      $('sortResults').addEventListener('change', sortEntries);
+      $('listView').addEventListener('click', () => setView('list'));
+      $('gridView').addEventListener('click', () => setView('grid'));
+      $('favoritesTab').addEventListener('click', showFavorites);
+      $('featuredTab').addEventListener('click', showArchive);
+      $('randomTab').addEventListener('click', () => {
+        state.showingFavorites = false;
+        setActiveTab('randomTab');
+        if (typeof window.randomIPA === 'function') window.randomIPA();
+      });
+      $('searchTab').addEventListener('click', () => {
+        setActiveTab('searchTab');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setTimeout(() => search.focus(), 250);
+      });
+      $('backTop').addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+      window.addEventListener('scroll', () => $('backTop').classList.toggle('show', window.scrollY > 500), { passive: true });
+      document.addEventListener('keydown', event => {
+        if (event.key === '/' && !/INPUT|SELECT|TEXTAREA/.test(document.activeElement?.tagName || '')) {
+          event.preventDefault();
+          search.focus();
+        }
+        if (event.key === 'Escape') {
+          searchHistory.hidden = true;
+          if (!$('overlay').hidden) $('overlay').hidden = true;
+        }
+      });
+
+      window.addEventListener('DOMContentLoaded', () => {
+        updateFavoriteCount();
+        updateSearchUI();
+        syncDeviceChips();
+        setView(localStorage.getItem(STORE_KEYS.view) || 'list');
+        if (typeof window.loadDB === 'function') window.loadDB();
+        setTimeout(afterContentChanged, 100);
+      });
+    })();
+  </script>
 </body>
 </html>
