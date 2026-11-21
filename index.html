@@ -1,109 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="initial-scale=1.0,maximum-scale=1.0">
-	<meta name="referrer" content="no-referrer">
-	<title>IPA Archive</title>
-	<link rel="shortcut icon" href="./favicon.ico">
-	<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
-	<link rel="stylesheet" href="style.css?v=2">
-	<script src='script.js?v=3'></script>
-</head>
-
-<body>
-	<button style="float: right; margin: 0 16px" onclick="randomIPA()">Random</button>
-	<h1>IPA Archive</h1>
-	<form onsubmit="event.preventDefault(); searchIPA(); return false;" autocomplete="off">
-		<input id="page" hidden>
-		<input id="minid" hidden>
-		<label for="search">Search: <input id="search" placeholder="Search"></label>
-		<label for="bundleid">BundleId: <input id="bundleid" placeholder="com.gameloft."></label>
-		<label for="unique">Unique: <input id="unique" type="checkbox" checked></label>
-		<label for="minos">min OS: <input id="minos" placeholder="1.0"></label>
-		<label for="maxos">max OS: <input id="maxos" placeholder="5.1.1"></label>
-		<label for="device">Device: <select id="device">
-				<option value="">Any</option>
-				<option value="1">iPhone</option>
-				<option value="2">iPad</option>
-				<option value="3">TV</option>
-				<option value="4">Watch</option>
-			</select></label>
-		<button type="submit">Search</button>
-	</form>
-
-	<div id="content">JavaScript disabled?</div>
-
-	<div id="templates" hidden>
-		<div class="entry full">
-			<div>
-				<img XSRC="$IMG" onerror="onImgError(this)">
-				<button onclick="installIPA($IDX)">Install</button>
-			</div>
-			<div class="info">
-				<h4>$TITLE</h4>
-				<div>BundleId: $BUNDLEID</div>
-				<div>Version: v$VERSION – $SIZE</div>
-				<div>Device: $PLATFORM</div>
-				<div>Minimum OS: $MINOS</div>
-				<div>Link: <a href="$URL" rel="noopener noreferrer nofollow">$URLNAME</a></div>
-			</div>
-		</div>
-		<div class="entry short">
-			<div><img XSRC="$IMG" onerror="onImgError(this)"></div>
-			<div class="info">
-				<h4>$TITLE</h4>
-				<div>BundleId: $BUNDLEID</div>
-				<div>Device: $PLATFORM</div>
-				<div>Minimum OS: $MINOS</div>
-				<div><a onclick="searchBundle($IDX)">Show all</a></div>
-			</div>
-		</div>
-		<div class="itunes">
-			<h4>iTunes Info:</h4>
-			<div>Genre: $GENRES</div>
-			<div>Rating: $RATING</div>
-			<div>Advisory: $ADVISORY</div>
-			<br>
-			<div>Current Version: <b>$VERSION</b> (last update: $DATE)</div>
-			<div>Price: $PRICE</div>
-			<div>Link: <a href="$URL" rel="noopener noreferrer nofollow">iTunes</a></div>
-			<div>$IMG</div>
-			<p>$DESCRIPTION</p>
-		</div>
-		<a class="screenshot" href="$REF" target="_blank"><img XSRC="$URL" crossorigin="anonymous"
-				referrerpolicy="no-referrer"></a>
-		<div class="randomAction">
-			Actions:
-			<button onclick="searchBundle($IDX, '&random=$IDX')">Show all versions</button>
-			<button onclick="randomIPA()">Next Random</button>
-		</div>
-		<div class="no-itunes">
-			<p>iTunes search disabled. No plist server configured.</p>
-			<a onclick="installIPA()">Configure now</a>
-		</div>
-	</div>
-
-	<div id="overlay" hidden>
-		<div id="installMsg">
-			<h3>Install on device</h3>
-			<p>
-				Unfortunatelly, this function is not possible with static HTML+JS.
-				You must provided a plist generator URL.
-				See <a href="https://github.com/stuffed18/ipa-archive-updated?tab=readme-ov-file#starting-plist-server" target="_blank">Readme</a> file for further instructions on how to set up such a
-				service.
-			</p>
-			<form onsubmit="event.preventDefault(); setPlistGen(); return false;" autocomplete="off">
-				<label for="plistServer">Generator URL:</label>
-				<input id="plistServer" placeholder="http://192.168.0.1/">
-				<button type="submit">Save</button>
-				<button type="button" onclick="document.getElementById('overlay').hidden=true">Abort</button>
-			</form>
-		</div>
-	</div>
-
-	<script>loadDB()</script>
-</body>
-
-</html>
+﻿<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="LegStore: a lightweight storefront for preserved iOS and Android apps, classic releases and original archive downloads."><meta name="theme-color" content="#32577e"><meta name="referrer" content="no-referrer"><title>LegStore — a little history, ready to download.</title><link rel="icon" href="assets/legstore.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="stylesheet" href="store.css?v=1"></head>
+<body data-theme="ios3"><a class="skip" href="#main">Skip to apps</a>
+<header class="masthead"><div class="header-inner"><a class="brand" href="#featured" aria-label="LegStore home"><img src="assets/legstore.svg" alt="" width="43" height="43"><span>LegStore<small>THE LEGACY APP STOREFRONT</small></span></a><nav aria-label="Main navigation"><button type="button" class="nav-button active" data-view="featured">Featured</button><button type="button" class="nav-button" data-view="browse">Browse</button><button type="button" class="nav-button" data-view="saved">Saved <span id="saved-count">0</span></button></nav><button type="button" id="theme-button" class="theme-button" aria-haspopup="dialog"><span class="theme-swatch"></span><span id="theme-name">iPhone OS 3</span></button></div></header>
+<main id="main" class="shell"><section class="intro" id="intro"><div class="intro-copy"><p class="eyebrow">GOOD APPS NEVER GET OLD.</p><h1>A little history.<br>Ready to download.</h1><p>Find the games you grew up with, the apps you miss, and the versions worth keeping.</p><div class="intro-actions"><button class="primary" id="explore-button" type="button">Explore the collection</button><button class="text-button" id="android-button" type="button">Browse Android apps</button></div><p class="quiet">iOS &amp; Android · Original archive links · No packages hosted here</p></div><button class="feature-ticket" id="foodfight-feature" type="button" aria-label="Browse Food Fight versions 1.0, 1.1 and 1.2"><span class="ticket-label">BACK ON THE SHELF</span><img id="feature-icon" src="assets/app-ios.svg" alt="Food Fight app icon" width="112" height="112"><strong>Food Fight</strong><span class="feature-sub">TomatoFlix · iPhone &amp; iPod touch</span><span class="version-pills"><span>v1.0</span><span>v1.1</span><span>v1.2</span></span><span class="ticket-bottom">Early releases, preserved together <b>View releases</b></span></button></section>
+<section class="catalog" aria-label="App catalogue"><div class="section-heading"><div><p class="eyebrow" id="section-kicker">THE COLLECTION</p><h2 id="section-title">Back in your pocket</h2></div><span id="catalog-count" class="count-label">Loading catalogue…</span></div>
+<form id="search-form" class="search-bar" role="search"><label class="search-input"><span aria-hidden="true">⌕</span><span class="sr-only">Search app name or bundle identifier</span><input id="search" type="search" placeholder="Search apps, games, or bundle IDs" autocomplete="off"><button type="button" id="clear-search" aria-label="Clear search">×</button></label><button type="submit" class="primary">Search</button></form>
+<div class="filter-bar"><div class="platform-tabs" role="group" aria-label="Platform"><button type="button" class="selected" data-platform="all">All apps</button><button type="button" data-platform="ios">iOS</button><button type="button" data-platform="android">Android</button></div><label class="select-label">Source <select id="source"><option value="all">All collections</option><option value="legacy">Original IPA Archive</option><option value="apkarchive">APK Archive</option><option value="mega">MEGA collection</option><option value="foodfight">Food Fight releases</option></select></label><label class="select-label">Sort <select id="sort"><option value="featured">Featured first</option><option value="az">Name A–Z</option><option value="za">Name Z–A</option><option value="small">Smallest download</option></select></label><button type="button" id="advanced-toggle" class="filter-button" aria-expanded="false" aria-controls="advanced">More filters</button></div>
+<div id="advanced" class="advanced" hidden><label>Minimum OS <input id="min-os" placeholder="e.g. 3.0" inputmode="decimal"></label><label>Maximum OS <input id="max-os" placeholder="e.g. 6.1.3" inputmode="decimal"></label><label>Device <select id="device"><option value="">Any device</option><option>iPhone</option><option>iPad</option><option>Android</option><option>TV</option><option>Watch</option></select></label><label class="check-label"><input id="unknown-os" type="checkbox" checked> Include unknown OS requirements</label></div>
+<div class="source-note" id="source-note">The full original iOS catalogue loads only when you browse or search it.</div><div id="status" class="status" role="status" aria-live="polite"></div><div id="app-grid" class="app-grid" aria-live="polite"></div><div id="empty" class="empty" hidden><span aria-hidden="true">⌕</span><h3>No apps on this shelf yet.</h3><p id="empty-text">Try a different name, source, or OS filter.</p><button id="reset-filters" type="button">Reset filters</button></div><div class="pager"><button id="previous" type="button">Previous</button><span id="page-info"></span><button id="next" type="button">Next page</button><button id="archive-more" type="button" hidden>Load more APK Archive results</button></div></section>
+<section class="collection-notes"><article><span class="mini-mark">iOS</span><h3>The original IPA collection</h3><p id="ios-summary">An extensive legacy catalogue, kept intact. Icons load only for apps on your screen.</p><a href="classic.html">Open the classic archive interface</a></article><article><span class="mini-mark android">APK</span><h3>A bigger Android shelf</h3><p id="android-summary">Browse a compact local selection, or search the entire APK Archive live.</p><button class="text-button" type="button" id="live-button">Search the full APK Archive</button></article><article><span class="mini-mark mega">M</span><h3>More from the community</h3><p>The linked MEGA folder adds preserved app releases, with a direct link to each file.</p><a href="https://mega.nz/folder/B2pShKDY#xl5HF4oL7cS8fvKxtCoaiA" target="_blank" rel="noopener noreferrer">Visit the MEGA collection</a></article></section></main>
+<footer><a class="footer-brand" href="#featured">LegStore</a><p>Preserve the app. Keep the memories.</p><div><button id="settings-button" class="text-button" type="button">Install settings</button><a href="https://github.com/BerryPVZ/LegStore" target="_blank" rel="noopener noreferrer">GitHub</a><button id="about-button" class="text-button" type="button">About the index</button></div></footer>
+<div id="modal" class="modal-backdrop" hidden><section class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1"><button id="modal-close" class="modal-close" aria-label="Close dialog" type="button">×</button><div id="modal-body"></div></section></div><div id="toast" class="toast" role="status" hidden></div><noscript><p>Enable JavaScript to search. Visit <a href="https://archive.org/details/apkarchive">APK Archive</a> or <a href="https://archive.org/details/com.tomatoflix.foodfight-ios3.0-clutch-2.0.4_202610">Food Fight’s archive page</a> directly.</p></noscript><script src="store-core.js?v=1"></script><script src="themes.js?v=1"></script><script src="store.js?v=1"></script></body></html>

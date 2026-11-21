@@ -1,115 +1,47 @@
-# The Grand IPA Archive
+﻿# LegStore
 
-Forked from relikd, indexed even more app. 
+A lightweight storefront for legacy iOS and Android apps. Twenty selectable themes recall desktop and mobile systems from the 2000s and early 2010s. Search by name or bundle ID, filter platform/source/device/OS requirements, save favourites locally, and choose individual releases.
 
-NO APPS ARE HOSTED ON THIS SITE. 
+## Collections
 
-Hello, this project aims to provide a searchable and filterable index for .ipa files.
-None of the linked files are mine, nor am I involved in any capacity on the referenced projects.
-I merely forked the crawler to index IPA files in various [Archive.org](https://archive.org) collections.
-The list of indexed collections can be found at [data/urls.json](data/urls.json).
+- The original IPA Archive is preserved, including its 190,610 release records and existing artwork. This large catalogue loads on demand. The original interface and OTA settings remain at `classic.html`.
+- APK Archive has a small local snapshot and paged live search across the full collection. Opening a live result resolves the actual APK files from Internet Archive metadata. Search needs the archive service to be reachable; the snapshot remains available if it fails.
+- The public MEGA folder is indexed with individual file links, rather than copying its packages.
+- Food Fight 1.0, 1.1 and 1.2 are explicitly listed from the requested archive item.
 
+No app packages are hosted here. Links depend on their original hosts. OS requirements are shown as unknown when unavailable; archive timestamps are not release dates. Installation still requires an appropriate device and installation method.
 
-## Using the webpage
+## Storage and icons
 
-You can add the [IPA Archive](https://stuffed18.github.io/ipa-archive-updated/) webpage to your homescreen.
-Note however, that each time you click on the app icon, it will reload the whole database and clear your previous results.
-To prevent that, use Safari instead.
-Switching back to the already open webpage, will not trigger a reload.
-The homescreen icon is still useful as bookmark though ;-)
+New artwork is resized to at most 96 × 96 pixels and saved as quality-68 WebP, plus a small JPEG fallback for older browsers. Pixel hashes deduplicate artwork across releases. Icons load lazily; catalogs and app packages are not written to localStorage. Only theme and saved-app preferences are stored there. One prototype currently lacks readable original artwork and uses a clearly identified platform icon.
 
-Additionally, your configuration is saved in the URL.
-For example, if you have an iPad 1. Gen, you can select device "iPad" and maxOS "5.1.1".
-Then click on search and safe that URL to your homescreen.
-(Or wait until you have configured your Plist server and save that URL instead)
+`data/source-report.json` records actual catalog/artwork sizes and missing original icons. The importer reads only bounded metadata, ZIP-directory ranges, plists and selected icon members. It refuses hosts that ignore Range requests and never saves IPA/APK packages. It also decodes Apple CgBI PNG icons.
 
+## Run and verify
 
-## Starting Plist Server
+No Node dependencies or build step are required:
 
-The Plist server needs either Python or PHP.
-
-You must start the service on a network location that is accessible to your iDevice.
-That can be, for example, your local Mac/PC which is accessible through your home network (LAN).
-You may need to determine the IP address of your PC.
-
-
-### ... with Python
-
-With python, the IP address *should* be determined automatically.
-Download [tools/plist_server.py](tools/plist_server.py) and start the server:
-
-```sh
-python3 tools/plist_server.py
+```
+python -m http.server 8765
+npm test
+python -m unittest discover -s tests -p "test_*.py"
 ```
 
-it will print out something like `Server started http://192.168.0.1:8026`.
-Use this address on the IPA Archive webpage.
-If the IP starts with `127.x.x.x` or `10.x.x.x`, you will need to find the IP address manually and use that instead.
+Open http://localhost:8765. Serve this repository with GitHub Pages as a static site. The classic optional OTA manifest backend is still in `tools/plist_server.py`.
 
+## Refresh the supplemental index
 
-### ... with PHP
+Use Python 3.10+ with Pillow and cryptography:
 
-Similar to python, you can download [tools/plist_server/index.php](tools/plist_server/index.php) and start the server with:
-
-```sh
-php -S 0.0.0.0:8026 -t tools/plist_server
+```
+python -m pip install Pillow cryptography
+python tools/index_sources.py --android-limit 80
 ```
 
-If you are already inside the `plist_server` directory, you can omit the `-t` flag.
-Note, we use `0.0.0.0` instead of localhost, to make the server available to other network devices.
-However, for the IPA Archive webpage you should use your own IP address, e.g., `http://192.168.0.1:8026`.
+Select a single source with `--source android`, `--source mega`, or `--source foodfight`. Android remains a bounded snapshot; the frontend searches the rest live. Refreshing does not prune old thumbnails, so shared icons are never deleted accidentally. Source constants and response budgets are in `tools/index_sources.py`. Review the report and changes before committing. `.local/` is scratch space and is ignored.
 
+For a small checkout, use Git's blob filter and sparse checkout to omit the original artwork/cache trees, retaining the root frontend files, `data/ipa.json`, `data/urls.json`, `data/supplemental.json`, `data/source-report.json`, and `data/icons/`. The full existing archive stays intact on GitHub.
 
-### Local IP address
+## Credits
 
-If the Python script does not detect the IP correctly - or you use PHP - you have to find the IP address manually.
-On a Mac you can run `ipconfig getifaddr en0`.
-Similar commands exist on Linux and Windows.
-
-
-## Development
-
-### Requirements
-
-- Python 3.x
-- [RemoteZip](https://github.com/gtsystem/python-remotezip) (`pip install remotezip`)
-- [Pillow](https://python-pillow.org/) (`pip install Pillow`)
-- `pngdefry` (included in the `pngdefry/` directory)
-
-
-### Database schema
-
-The column `done` is encoded as follows:
-- `0` (queued, needs processing)
-- `1` (done)
-- `2` (image retry, processing successful but icon was missing)
-- `3` (error, maybe fixable, needs attention)
-- `4` (error, unfixable, ignore in export)
-
-
-### General workflow
-
-To add files to the archive follow these steps:
-
-1. `python3 main.py add URL`
-2. `python3 main.py run`
-3. If any of the URLs failed, check if it can be fixed. (though most likely the ipa-zip file is broken)
-    - If fixable, `python3 main.py err reset` # set all err to done=0 and print errors again
-    - If unfixable, `python3 main.py set err ID1 ID2` # mark ids done=4
-4. `./tools/image_optim.sh` (this will convert all .png files to .jpg)
-5. `python3 main.py export json`
-
-
-To update:
-- `python3 main.py update` # check all links (if not udpated recently)
-- `python3 main.py update [url|base_url_id]`  # force update
-- Then run the same steps as after adding an url
-
-
-Userful helper:
-- `./tools/check_error_no_plist.sh` # checks that no plist exists for a done=4 entry
-- `./tools/check_missing_img.sh` # checks that for each .plist an .jpg exists
-- `./tools/convert_plist.sh 21968` # convert json-like format to XML
-- `./main.py get url 21968` # print URL of entry
-- `./main.py get img 21968` # force (re)download of .png image
-- `./main.py get ipa 21968` # download ipa file for debugging
+Based on the Grand IPA Archive work by relikd, stuffed18 and BerryPVZ. Original crawler tools and MIT license are retained. Operating-system names describe visual inspiration; this project is unaffiliated with their owners. App artwork belongs to its respective creators.
