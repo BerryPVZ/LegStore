@@ -1,15 +1,15 @@
 const test=require('node:test');
 const fs=require('fs'),vm=require('vm'),assert=require('assert/strict');
 const {parseHTML}=require('linkedom');
-const {window}=parseHTML(fs.readFileSync('index.html','utf8'));let pending=0,errors=[];
+const {window}=parseHTML(fs.readFileSync('index.html','utf8'));let pending=0,errors=[],requests=[];
 const values={source:'all',sort:'featured',device:'',search:'','min-os':'','max-os':''};
 for(const [id,value] of Object.entries(values)){Object.defineProperty(window.document.getElementById(id),'value',{value,writable:true,configurable:true});}
 window.document.getElementById('unknown-os').checked=true;
-class XHR{open(method,url){this.url=url;}send(){pending++;setImmediate(()=>{try{const raw=fs.readFileSync(this.url);this.status=200;this.responseText=raw.toString();this.onload();}catch(e){this.status=404;this.responseText='{}';try{this.onload();}catch(error){errors.push(error);}}finally{pending--;}});}}
+class XHR{open(method,url){this.url=url;requests.push(url);}send(){pending++;setImmediate(()=>{try{const raw=fs.readFileSync(this.url);this.status=200;this.responseText=raw.toString();this.onload();}catch(e){this.status=404;this.responseText='{}';try{this.onload();}catch(error){errors.push(error);}}finally{pending--;}});}}
 const context=vm.createContext({window,document:window.document,location:{hash:''},localStorage:{getItem:()=>null,setItem:()=>{}},XMLHttpRequest:XHR,setTimeout:()=>{},console,Math});
 for(const file of ['store-core.js','themes.js','store.js']){if(file==='store-core.js'){window.LegStoreCore=require('../store-core.js');continue;}vm.runInContext(fs.readFileSync(file,'utf8'),context,{filename:file});}
 async function settle(){for(let i=0;i<500&&pending;i++)await new Promise(r=>setImmediate(r));assert.equal(pending,0);assert.deepEqual(errors,[]);}
-test('storefront navigation, Seth, complete indexes and read-only TestFlight',async()=>{await settle();assert.equal(window.document.querySelectorAll('.app-card').length,24);assert.match(window.document.getElementById('seth-line').textContent,/How about/);
+test('storefront navigation, Seth, complete indexes and read-only TestFlight',async()=>{await settle();assert.equal(window.document.querySelectorAll('.app-card').length,24);assert.match(window.document.getElementById('seth-line').textContent,/How about/);assert.ok(requests.includes('data/legacy-suggestions.json'));assert.ok(!requests.includes('data/ipa.json'),'Original suggestions work before the full release catalogue loads');
 window.document.getElementById('seth-again').onclick();assert.equal(window.document.getElementById('seth-search').disabled,false);
 window.document.querySelector('[data-view="testflight"]').onclick();await settle();assert.match(window.document.getElementById('status').textContent,/83,744/);assert.equal(window.document.querySelector('.get-button').textContent,'VIEW');window.document.querySelector('.get-button').onclick();assert.equal(window.document.querySelectorAll('.download-link').length,0);assert.match(window.document.getElementById('modal-body').textContent,/No IPA downloads/);
 window.document.getElementById('modal-close').onclick();window.document.querySelector('[data-platform="android"]').onclick();window.document.getElementById('source').value='apkarchive';window.document.getElementById('source').onchange();await settle();assert.match(window.document.getElementById('status').textContent,/135,901/);assert.equal(window.document.querySelectorAll('.app-card').length,24);

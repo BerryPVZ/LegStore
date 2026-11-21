@@ -1,6 +1,6 @@
 # LegStore
 
-An index of legacy iOS and Android apps. Twenty selectable, glossy themes use styles from desktop and mobile systems of the 2000s and early 2010s. Search by name or bundle ID, filter platform/source/device/OS requirements, save favourites locally, and choose individual releases.
+An index of legacy iOS and Android apps. Twenty selectable, glossy themes use styles from desktop and mobile systems of the 2000s and early 2010s. Search by name or bundle ID, filter platform/source/device/OS requirements, save favourites locally, and choose individual releases. The iOS search category combines the original LegStore archive and added IPA collections; source badges remain visible on releases. TestFlight remains a separate view-only index.
 
 ## Collections
 
@@ -24,7 +24,7 @@ Space mode loads all three indexes and projects app-icon stars into a steerable,
 
 ## Seth
 
-Seth is the blue blob beside the search controls. His suggestions are sampled from app names and bundle IDs in the loaded catalogues, with a new choice on each visit or press of “Another idea”. “Search this” searches the suggested keyword. There is no separate curated suggestion list.
+Seth is the blue blob beside the search controls. His suggestions use a shuffled deck of distinct apps, with random name/bundle keywords and no first/last-row preference. Apps are not repeated until the deck has been covered. The original LegStore catalogue is included automatically through `data/legacy-suggestions.json` (all distinct original names and bundle IDs in a compact 2.5 MB list), without requiring a prior Browse search or downloading the full 26 MB release catalogue. Android and TestFlight entries join the deck when their indexes load. A new choice is made on each visit or press of “Another idea”. “Search this” searches the suggested keyword. There is no curated suggestion list. Rebuild the compact original-app list after updating the original index with `python tools/build_legacy_suggestions.py`.
 
 ## Android artwork and storage
 

@@ -1,7 +1,7 @@
 {
   "entries": 222,
-  "iconFiles": 22172,
-  "iconBytes": 35237222,
+  "iconFiles": 82174,
+  "iconBytes": 130205422,
   "catalogBytes": 177158,
   "missingIcons": [
     "ia-mcpe-apk",
@@ -16,8 +16,8 @@
   "androidFullIndexItems": 135901,
   "testflightViewOnlyRecords": 83744,
   "androidArtworkMode": "manifest-resolved, cached thumbnails plus on-demand range extraction",
-  "testflightCachedExact": 12950,
-  "testflightIconsAttempted": 16542,
-  "testflightIconsComplete": false,
-  "testflightSameAppFallbacks": 153
+  "testflightCachedExact": 66381,
+  "testflightIconsAttempted": 83744,
+  "testflightIconsComplete": true,
+  "testflightSameAppFallbacks": 2279
 }
