@@ -16,3 +16,17 @@ class Sources(unittest.TestCase):
   raw=b'\x89PNG\r\n\x1a\n'+chunk(b'CgBI',b'')+chunk(b'IHDR',struct.pack('>IIBBBBB',1,1,8,6,0,0,0))+chunk(b'IDAT',data)
   self.assertEqual(s.decode_image(raw).getpixel((0,0)),(59,39,19,128))
 if __name__=='__main__':unittest.main()
+class DeclaredIcons(unittest.TestCase):
+ def test_ios_uses_plist_icon_instead_of_tutorial_or_atlas(self):
+  import zipfile,plistlib
+  data=io.BytesIO()
+  from PIL import Image
+  image=io.BytesIO();Image.new('RGBA',(40,40),'blue').save(image,'PNG')
+  with zipfile.ZipFile(data,'w') as z:
+   z.writestr('Payload/A.app/Info.plist',plistlib.dumps({'CFBundleIconFiles':['Launcher']}))
+   z.writestr('Payload/A.app/Launcher.png',image.getvalue())
+   z.writestr('Payload/A.app/tutorial_icon@2x.png',b'wrong')
+   z.writestr('Payload/A.app/assets/appicon_atlas.png',b'wrong')
+  with patch.object(s,'RemoteZip',return_value=io.BytesIO(data.getvalue())):
+   raw,meta=s.zip_icon('https://example.com/test.ipa',len(data.getvalue()),ios=True)
+  self.assertEqual(raw,image.getvalue())

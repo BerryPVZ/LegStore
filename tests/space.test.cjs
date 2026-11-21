@@ -1,0 +1,3 @@
+﻿const test=require('node:test'),assert=require('node:assert/strict'),S=require('../space.js');
+test('holding accelerates and release coasts without an instant stop',()=>{let speed=0;for(let i=0;i<120;i++)speed=S.advance(speed,true,1/60);assert.ok(speed>6000&&speed<=7200);const released=S.advance(speed,false,1/60);assert.ok(released>0&&released<speed);for(let i=0;i<600;i++)speed=S.advance(speed,false,1/60);assert.equal(speed,0);});
+test('space speed stays bounded and is independent of frame rate',()=>{let a=0,b=0;for(let i=0;i<60;i++)a=S.advance(a,true,1/60);for(let i=0;i<120;i++)b=S.advance(b,true,1/120);assert.ok(Math.abs(a-b)<.001);for(let i=0;i<10000;i++)a=S.advance(a,true,.1);assert.equal(a,7200);assert.equal(S.advance(a,false,-1),a);});

@@ -1,12 +1,23 @@
 {
   "entries": 222,
-  "iconFiles": 268,
-  "iconBytes": 602280,
-  "catalogBytes": 175266,
+  "iconFiles": 22172,
+  "iconBytes": 35237222,
+  "catalogBytes": 177158,
   "missingIcons": [
+    "ia-mcpe-apk",
+    "ia-cut-the-rope-gold-v-3.7.0",
+    "ia-plants-vs-zombies-2_v9.8.1-mod1",
+    "ia-angry-birds-2-android-windows",
     "mega-F6gFkS7I"
   ],
   "http_bytes": 2708953,
   "icons_written": 7,
-  "packages_saved": 0
+  "packages_saved": 0,
+  "androidFullIndexItems": 135901,
+  "testflightViewOnlyRecords": 83744,
+  "androidArtworkMode": "manifest-resolved, cached thumbnails plus on-demand range extraction",
+  "testflightCachedExact": 12950,
+  "testflightIconsAttempted": 16542,
+  "testflightIconsComplete": false,
+  "testflightSameAppFallbacks": 153
 }

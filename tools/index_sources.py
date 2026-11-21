@@ -34,7 +34,7 @@ def search_archive(query,page=1,rows=100):
 
 class RemoteZip(io.RawIOBase):
  """A bounded, seekable HTTP-range reader; never falls back to a full package."""
- def __init__(self,url,size,aes=None):self.url=url;self.size=int(size);self.pos=0;self.aes=aes;self.used=0
+ def __init__(self,url,size,aes=None,max_read=1024*1024,budget=2*1024*1024):self.url=url;self.size=int(size);self.pos=0;self.aes=aes;self.used=0;self.max_read=max_read;self.budget=budget
  def readable(self):return True
  def seekable(self):return True
  def tell(self):return self.pos
@@ -46,18 +46,24 @@ class RemoteZip(io.RawIOBase):
   if n<0:n=self.size-self.pos
   n=min(n,self.size-self.pos)
   if n<=0:return b''
-  if n>1024*1024 or self.used+n>2*1024*1024:raise ValueError('ZIP range budget exceeded')
-  start=self.pos;end=start+n-1
-  raw,headers=fetch(self.url,limit=n+32,headers={'Range':f'bytes={start}-{end}'})
+  cached=getattr(self,'cache_data',b'');base=getattr(self,'cache_start',-1)
+  if base<=self.pos and self.pos+n<=base+len(cached):
+   raw=cached[self.pos-base:self.pos-base+n];self.pos+=n;return raw
+  if n>self.max_read:raise ValueError('ZIP range budget exceeded')
+  start=self.pos;length=min(self.size-start,max(n,65536));end=start+length-1
+  if self.used+length>self.budget:raise ValueError('ZIP range budget exceeded')
+  raw,headers=fetch(self.url,limit=length+32,headers={'Range':f'bytes={start}-{end}'})
   cr=next((v for k,v in headers.items() if k.lower()=='content-range'),'')
   if not cr.startswith(f'bytes {start}-'):raise ValueError('Host did not honor HTTP Range; full package refused')
-  self.used+=len(raw);self.pos+=len(raw)
+  if len(raw)!=length:raise ValueError('Incomplete HTTP range')
+  self.used+=len(raw)
   if self.aes:
    key,nonce=self.aes;block=start//16;skip=start%16
    counter=int.from_bytes(nonce,'big')+block
    decrypt=Cipher(algorithms.AES(key),modes.CTR(counter.to_bytes(16,'big'))).decryptor()
    raw=decrypt.update(bytes(skip)+raw)[skip:]
-  return raw
+  self.cache_start=start;self.cache_data=raw;self.pos+=n
+  return raw[:n]
 
 def member(z,name,limit=512*1024):
  item=z.getinfo(name)
@@ -68,23 +74,31 @@ def member(z,name,limit=512*1024):
  return data
 def zip_icon(url,size,aes=None,ios=False):
  with zipfile.ZipFile(RemoteZip(url,size,aes)) as z:
-  metadata={}
+  metadata={};p={};path=None
   if ios:
    path=next((x for x in z.namelist() if re.fullmatch(r'Payload/[^/]+\.app/Info.plist',x)),None)
    if path:
     p=plistlib.loads(member(z,path,256*1024));metadata={'title':p.get('CFBundleDisplayName') or p.get('CFBundleName'),'bundle':p.get('CFBundleIdentifier'),'version':str(p.get('CFBundleShortVersionString') or p.get('CFBundleVersion') or ''),'minOS':p.get('MinimumOSVersion','')}
+  if not ios:
+   # Android callers must resolve the launcher resource from the manifest.
+   raise ValueError('Use index_android_icons.apk_icon for APK artwork')
+  names=[]
+  for value in [p.get('CFBundleIconFile'),p.get('CFBundleIconFiles',[]),p.get('CFBundleIcons',{}).get('CFBundlePrimaryIcon',{}).get('CFBundleIconFiles',[]),p.get('CFBundleIcons~ipad',{}).get('CFBundlePrimaryIcon',{}).get('CFBundleIconFiles',[])]:
+   if isinstance(value,str):names.append(value)
+   elif isinstance(value,list):names.extend(x for x in value if isinstance(x,str))
+  # Standard root-level icon names are permitted only when no plist icon is declared.
+  if not names:names=['Icon.png','Icon@2x.png','icon.png']
+  root=path.rsplit('/',1)[0]+'/' if path else ''
   candidates=[]
-  for item in z.infolist():
-   name=item.filename.lower()
-   if not name.endswith(('.png','.webp','.jpg','.jpeg')) or item.file_size>512*1024:continue
-   if not any(term in name for term in ['icon','launcher','appicon']):continue
-   score=(40 if 'launcher' in name else 20)+(12 if 'xxxhdpi' in name else 9 if 'xxhdpi' in name else 6 if '@2x' in name else 0)-(30 if any(t in name for t in ['facebook','google','notification','small']) else 0)
-   candidates.append((score,item.filename))
-  for _,name in sorted(candidates,reverse=True)[:6]:
+  for name in names:
+   if '/' in name:continue
+   stem=name[:-4] if name.lower().endswith('.png') else name
+   for suffix in ['@3x.png','@2x.png','.png']:
+    candidate=root+stem+suffix
+    if candidate in z.namelist() and candidate not in candidates:candidates.append(candidate)
+  for candidate in candidates:
    try:
-    raw=member(z,name);im=decode_image(raw)
-    if im.width<32 or im.height<32:continue
-    return raw,metadata
+    raw=member(z,candidate);decode_image(raw);return raw,metadata
    except (ValueError,OSError):continue
   return None,metadata
 
@@ -96,12 +110,14 @@ def decode_image(raw):
    length=int.from_bytes(raw[pos:pos+4],'big');kind=raw[pos+4:pos+8];chunk=raw[pos+8:pos+8+length];pos+=12+length
    if kind==b'IHDR':width,height,depth,color=struct.unpack('>IIBB',chunk[:10])
    if kind==b'IDAT':payload+=chunk
-  if not width or width*height>4_000_000 or depth!=8 or color!=6:raise ValueError('Unsupported CgBI icon')
-  pixels=zlib.decompress(payload,-15);stride=width*4;out=bytearray();prev=bytearray(stride)
+  if not width or width*height>4_000_000 or depth!=8 or color not in (2,6):raise ValueError('Unsupported CgBI icon')
+  bpp=4 if color==6 else 3;stride=width*bpp;pixels=zlib.decompressobj(-15).decompress(payload,(stride+1)*height+1)
+  if len(pixels)!=(stride+1)*height:raise ValueError('Invalid CgBI pixel count')
+  out=bytearray();prev=bytearray(stride)
   for y in range(height):
    off=y*(stride+1);kind=pixels[off];line=bytearray(pixels[off+1:off+1+stride])
    for x in range(stride):
-    a=line[x-4] if x>=4 else 0;b=prev[x];c=prev[x-4] if x>=4 else 0
+    a=line[x-bpp] if x>=bpp else 0;b=prev[x];c=prev[x-bpp] if x>=bpp else 0
     if kind==1:v=a
     elif kind==2:v=b
     elif kind==3:v=(a+b)//2
@@ -110,12 +126,14 @@ def decode_image(raw):
     elif kind==0:v=0
     else:raise ValueError('Invalid PNG filter')
     line[x]=(line[x]+v)&255
-   for x in range(0,stride,4):
-    blue,green,red,alpha=line[x:x+4]
+   for x in range(0,stride,bpp):
+    blue,green,red=line[x:x+3];alpha=line[x+3] if bpp==4 else 255
     out.extend((min(255,red*255//alpha) if alpha else 0,min(255,green*255//alpha) if alpha else 0,min(255,blue*255//alpha) if alpha else 0,alpha))
    prev=line
   return Image.frombytes('RGBA',(width,height),bytes(out))
- im=Image.open(io.BytesIO(raw));im.load();return im
+ im=Image.open(io.BytesIO(raw))
+ if im.width*im.height>4_000_000:raise ValueError('Icon exceeds pixel budget')
+ im.load();return im
 
 def compress_icon(raw):
  try:
@@ -123,6 +141,7 @@ def compress_icon(raw):
   im=decode_image(raw);im=ImageOps.exif_transpose(im).convert('RGBA');im.thumbnail((96,96),Image.Resampling.LANCZOS)
   # Pixel hashes deduplicate the same app artwork across sources/versions.
   digest=hashlib.sha256(im.tobytes()+str(im.size).encode()).hexdigest()[:18]
+  if digest=='14be8cf6f5a2936a94':return None # Archive.org placeholder, never app artwork
   webp=ICONS/(digest+'.webp');jpg=ICONS/(digest+'.jpg')
   if not webp.exists():
    im.save(webp,'WEBP',quality=68,method=6)
@@ -210,18 +229,11 @@ def android_item(doc):
  try:
   data=jsget('https://archive.org/metadata/'+urllib.parse.quote(ident,safe=''));files=[f for f in data.get('files',[]) if f['name'].lower().endswith('.apk')]
   if not files:return None
-  images=[f for f in data.get('files',[]) if f['name'].lower().endswith(('.png','.webp','.jpg','.jpeg')) and int(f.get('size',0))<=512*1024]
   icon=None
-  for f in sorted(images,key=lambda f:('icon' not in f['name'].lower(),'thumb' in f['name'].lower()))[:2]:
-   try:icon=compress_icon(fetch(archive_url(ident,f['name']),limit=512*1024)[0])
-   except Exception:pass
-   if icon:break
-  if not icon:
-   try:icon=compress_icon(zip_icon(archive_url(ident,files[0]['name']),files[0].get('size',0))[0])
-   except Exception:pass
-  if not icon:
-   try:icon=compress_icon(fetch('https://archive.org/services/img/'+urllib.parse.quote(ident,safe=''),limit=512*1024)[0])
-   except Exception:pass
+  try:
+   from index_android_icons import apk_icon
+   icon,_,_=apk_icon(archive_url(ident,files[0]['name']),int(files[0].get('size',0)))
+  except Exception:pass
   variants=[{'version':title_from_filename(f['name'])[2] or 'Unspecified','filename':f['name'],'size':int(f.get('size',0)),'url':archive_url(ident,f['name'])} for f in files[:100]]
   return {'id':'ia-'+ident,'title':title,'bundle':'','version':variants[0]['version'],'platform':'android','source':'apkarchive','archiveId':ident,'size':variants[0]['size'],'minOS':'','filename':variants[0]['filename'],'url':variants[0]['url'],'icon':icon or '', 'iconKind':'compressed' if icon else 'fallback','device':'Android','category':'Apps','versions':variants,'archiveDate':doc.get('date',''),'details':'https://archive.org/details/'+ident}
  except Exception as e:
